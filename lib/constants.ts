@@ -1,7 +1,7 @@
 export const IMAGES = {
-  logo: '/images/default-logo.png',
-  avatar: '/images/default-avatar.png',
-  placeholder: '/images/placeholder.jpg'
+  logo: '/images/logo.svg',
+  avatar: '/images/user-avatar.svg',
+  placeholder: '/images/placeholder.svg'
 } as const
 
 export const ROUTES = {

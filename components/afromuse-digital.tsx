@@ -16,6 +16,7 @@ import { MarketingPlans } from './services/MarketingPlans'
 import { EPKCreation } from './services/EPKCreation'
 import { AlbumArtwork } from './services/AlbumArtwork'
 import { AIMarketingAdvisor } from './services/AIMarketingAdvisor'
+import { IMAGES } from '@/lib/constants'
 
 const pixelifySans = Pixelify_Sans({ subsets: ['latin'] })
 
@@ -248,7 +249,7 @@ export function AfromuseDigitalComponent() {
           <div className="w-full max-w-md space-y-6">
             <div className="space-y-2 text-center">
               <Image
-                src="/images/logo.png"
+                src={IMAGES.logo}
                 alt="Afromuse Digital Logo"
                 width={80}
                 height={80}
@@ -292,7 +293,7 @@ export function AfromuseDigitalComponent() {
               <p className="text-xl text-[#FF00E6]">Empowering African creators worldwide</p>
             </div>
             <Avatar className="h-12 w-12 rounded-none border-2 border-[#00FF9F]">
-              <AvatarImage src="/images/user-avatar.png" alt="User" />
+              <AvatarImage src={IMAGES.avatar} alt="User" />
               <AvatarFallback>UN</AvatarFallback>
             </Avatar>
           </header>
@@ -409,7 +410,7 @@ export function AfromuseDigitalComponent() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center space-x-4">
                     <Avatar className="h-16 w-16 rounded-none border-2 border-[#00FF9F]">
-                      <AvatarImage src="/images/user-avatar.png" alt="User" />
+                      <AvatarImage src={IMAGES.avatar} alt="User" />
                       <AvatarFallback>UN</AvatarFallback>
                     </Avatar>
                     <div>
@@ -453,13 +454,13 @@ export function AfromuseDigitalComponent() {
               <TestimonialCard
                 name="Teepsoul Entertainment"
                 quote="Afromuse Digital helped us reach a global audience we never thought possible!"
-                image="/placeholder.svg?height=64&width=64"
+                image={IMAGES.placeholder}
                 rating={5}
               />
               <TestimonialCard
                 name="Aisha M."
                 quote="The AI Marketing Advisor gave me insights that boosted my streams by 200%!"
-                image="/placeholder.svg?height=64&width=64"
+                image={IMAGES.placeholder}
                 rating={5}
               />
             </div>
