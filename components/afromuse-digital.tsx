@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
-import { PenTool, FileText, ImageIcon, MessageSquare, Star, PlusCircle } from 'lucide-react'
+import { Star } from 'lucide-react'
 import { Pixelify_Sans } from 'next/font/google'
 import Image from 'next/image'
 
@@ -76,7 +76,6 @@ export function AfromuseDigitalComponent() {
   const [newMessage, setNewMessage] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [creditHistory, setCreditHistory] = useState<CreditTransaction[]>([])
-  const [spotifyConnected, setSpotifyConnected] = useState(false)
 
   const onboardingSteps = [
     {
@@ -143,30 +142,6 @@ export function AfromuseDigitalComponent() {
     return false
   }
 
-  const createProject = () => {
-    if (newProjectName && newProjectDescription) {
-      const newProject: Project = {
-        id: Date.now(),
-        name: newProjectName,
-        description: newProjectDescription,
-        status: 'pending',
-        timeline: {
-          created: new Date(),
-          updated: new Date(),
-        },
-        messages: [],
-        serviceType: 'marketing',
-        data: {}
-      }
-      setProjects([...projects, newProject])
-      setNewProjectName('')
-      setNewProjectDescription('')
-      handleCreditTransaction('usage', 10, 'Create new project')
-    } else {
-      setError("Please provide both project name and description")
-    }
-  }
-
   const purchaseCredits = (amount: number) => {
     setCredits(credits + amount)
     alert(`${amount} credits purchased!`)
@@ -206,19 +181,6 @@ export function AfromuseDigitalComponent() {
     }
     setCreditHistory(prev => [...prev, transaction])
     setCredits(prev => type === 'purchase' ? prev + amount : prev - amount)
-  }
-
-  const connectSpotify = async () => {
-    try {
-      // Replace with your Spotify OAuth implementation
-      const response = await fetch('/api/spotify/connect')
-      const data = await response.json()
-      if (data.success) {
-        setSpotifyConnected(true)
-      }
-    } catch (error) {
-      setError('Failed to connect Spotify account')
-    }
   }
 
   if (error) {
