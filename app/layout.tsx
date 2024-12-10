@@ -3,25 +3,53 @@
 import { Authenticator } from '@aws-amplify/ui-react'
 import '@aws-amplify/ui-react/styles.css'
 import { Amplify } from 'aws-amplify'
-import config from '@/amplify_outputs.json'
 import './globals.css'
 
+// Fetch config at runtime instead of build time
+async function getConfig() {
+  const response = await fetch('/amplify_outputs.json')
+  return response.json()
+}
+
+// Initialize with empty config, will be updated after hydration
 Amplify.configure({
   Auth: {
     Cognito: {
-      userPoolId: config.auth.user_pool_id,
-      userPoolClientId: config.auth.user_pool_client_id,
+      userPoolId: 'us-east-1_78hZYfLRj',
+      userPoolClientId: '69ccvp1t9jera396jdj1a85v11',
       signUpVerificationMethod: 'code',
     }
   },
   API: {
     GraphQL: {
-      endpoint: config.data.url,
-      region: config.data.aws_region,
+      endpoint: 'https://geva3gsrrfgxdgatgt3sgkjjp4.appsync-api.us-east-1.amazonaws.com/graphql',
+      region: 'us-east-1',
       defaultAuthMode: 'userPool'
     }
   }
 }, { ssr: true })
+
+// Update config after hydration
+if (typeof window !== 'undefined') {
+  getConfig().then(config => {
+    Amplify.configure({
+      Auth: {
+        Cognito: {
+          userPoolId: config.auth.user_pool_id,
+          userPoolClientId: config.auth.user_pool_client_id,
+          signUpVerificationMethod: 'code',
+        }
+      },
+      API: {
+        GraphQL: {
+          endpoint: config.data.url,
+          region: config.data.aws_region,
+          defaultAuthMode: 'userPool'
+        }
+      }
+    }, { ssr: true })
+  })
+}
 
 export default function RootLayout({
   children,
@@ -31,11 +59,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Authenticator.Provider>
-          <main className="min-h-screen bg-[#120458]">
-            {children}
-          </main>
-        </Authenticator.Provider>
+        <Authenticator.Provider>{children}</Authenticator.Provider>
       </body>
     </html>
   )
