@@ -5,19 +5,20 @@ import '@aws-amplify/ui-react/styles.css'
 import { Amplify } from 'aws-amplify'
 import './globals.css'
 
-// Fetch config at runtime instead of build time
-async function getConfig() {
-  const response = await fetch('/amplify_outputs.json')
-  return response.json()
-}
-
-// Initialize with empty config, will be updated after hydration
+// Initial config with simpler password policy
 Amplify.configure({
   Auth: {
     Cognito: {
       userPoolId: 'us-east-1_78hZYfLRj',
       userPoolClientId: '69ccvp1t9jera396jdj1a85v11',
       signUpVerificationMethod: 'code',
+      passwordFormat: {
+        minLength: 8,
+        requireLowercase: true,
+        requireUppercase: false,
+        requireNumbers: true,
+        requireSpecialCharacters: false,
+      }
     }
   },
   API: {
@@ -29,26 +30,35 @@ Amplify.configure({
   }
 }, { ssr: true })
 
-// Update config after hydration
+// Update config after hydration with same password policy
 if (typeof window !== 'undefined') {
-  getConfig().then(config => {
-    Amplify.configure({
-      Auth: {
-        Cognito: {
-          userPoolId: config.auth.user_pool_id,
-          userPoolClientId: config.auth.user_pool_client_id,
-          signUpVerificationMethod: 'code',
+  fetch('/amplify_outputs.json')
+    .then(response => response.json())
+    .then(config => {
+      Amplify.configure({
+        Auth: {
+          Cognito: {
+            userPoolId: config.auth.user_pool_id,
+            userPoolClientId: config.auth.user_pool_client_id,
+            signUpVerificationMethod: 'code',
+            passwordFormat: {
+              minLength: 8,
+              requireLowercase: true,
+              requireUppercase: false,
+              requireNumbers: true,
+              requireSpecialCharacters: false,
+            }
+          }
+        },
+        API: {
+          GraphQL: {
+            endpoint: config.data.url,
+            region: config.data.aws_region,
+            defaultAuthMode: 'userPool'
+          }
         }
-      },
-      API: {
-        GraphQL: {
-          endpoint: config.data.url,
-          region: config.data.aws_region,
-          defaultAuthMode: 'userPool'
-        }
-      }
-    }, { ssr: true })
-  })
+      }, { ssr: true })
+    })
 }
 
 export default function RootLayout({
