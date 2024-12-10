@@ -65,7 +65,7 @@ type Project = {
 }
 
 export function AfromuseDigitalComponent() {
-  const { user, signOut } = useAuthenticator()
+  const { user, signOut } = useAuthenticator((context) => [context.user])
   const [screen, setScreen] = useState<'onboarding' | 'dashboard'>('onboarding')
   const [onboardingStep, setOnboardingStep] = useState(0)
   const [credits, setCredits] = useState(250)
@@ -193,22 +193,6 @@ export function AfromuseDigitalComponent() {
   // Get user name safely
   const userName = user?.username || 'User'
   const userInitial = userName.charAt(0).toUpperCase()
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#120458] text-[#00FF9F]">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Error</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{error}</p>
-            <Button onClick={() => setError(null)} className="mt-4">Try Again</Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
 
   return (
     <AuthenticatorWrapper>
