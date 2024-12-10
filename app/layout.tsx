@@ -1,13 +1,28 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+'use client'
 
-const inter = Inter({ subsets: ["latin"] });
+import { Authenticator } from '@aws-amplify/ui-react'
+import '@aws-amplify/ui-react/styles.css'
+import { Amplify } from 'aws-amplify'
+import { type Schema } from '@/amplify/data/resource'
+import config from '../amplify_outputs.json'
+import './globals.css'
 
-export const metadata: Metadata = {
-  title: "Afromuse Digital",
-  description: "Empowering African creators worldwide",
-};
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId: config.auth.user_pool_id,
+      userPoolClientId: config.auth.user_pool_client_id,
+      signUpVerificationMethod: 'code',
+    }
+  },
+  API: {
+    GraphQL: {
+      endpoint: config.data.url,
+      region: config.data.aws_region,
+      defaultAuthMode: 'userPool'
+    }
+  }
+}, { ssr: true })
 
 export default function RootLayout({
   children,
@@ -16,7 +31,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body>
+        <Authenticator.Provider>
+          <main className="min-h-screen bg-[#120458]">
+            {children}
+          </main>
+        </Authenticator.Provider>
+      </body>
     </html>
-  );
+  )
 }

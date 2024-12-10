@@ -1,5 +1,5 @@
 export const IMAGES = {
-  logo: '/images/logo.svg',
+  logo: '/images/logo.png',
   avatar: '/images/user-avatar.svg',
   placeholder: '/images/placeholder.svg'
 } as const

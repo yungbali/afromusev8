@@ -1,5 +1,5 @@
-import { AfromuseDigitalComponent } from '@/components/afromuse-digital'
+import { AfromuseDigitalWrapper } from '@/components/client/AfromuseDigitalWrapper'
 
 export default function Home() {
-  return <AfromuseDigitalComponent />
+  return <AfromuseDigitalWrapper />
 }
