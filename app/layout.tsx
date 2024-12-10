@@ -15,9 +15,9 @@ Amplify.configure({
       passwordFormat: {
         minLength: 8,
         requireLowercase: true,
-        requireUppercase: false,
+        requireUppercase: true,
         requireNumbers: true,
-        requireSpecialCharacters: false,
+        requireSpecialCharacters: true,
       }
     }
   },
@@ -44,9 +44,9 @@ if (typeof window !== 'undefined') {
             passwordFormat: {
               minLength: 8,
               requireLowercase: true,
-              requireUppercase: false,
+              requireUppercase: true,
               requireNumbers: true,
-              requireSpecialCharacters: false,
+              requireSpecialCharacters: true,
             }
           }
         },
