@@ -68,17 +68,25 @@ export function AfromuseDigitalComponent() {
   const { user, signOut } = useAuthenticator((context) => [context.user])
   const [screen, setScreen] = useState<'onboarding' | 'dashboard'>('onboarding')
   const [onboardingStep, setOnboardingStep] = useState(0)
-  const [credits, setCredits] = useState(250)
+  const [credits, setCredits] = useState(500)
   const [showFeedback, setShowFeedback] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])
   const [newProjectName, setNewProjectName] = useState('')
   const [newProjectDescription, setNewProjectDescription] = useState('')
   const [messages, setMessages] = useState<Array<{ id: number; sender: string; content: string }>>([
-    { id: 1, sender: 'System', content: 'Welcome to Afromuse Digital! How can we assist you today?' },
+    { id: 1, sender: 'System', content: 'Welcome to Afromuse Digital! You have been credited with 500 credits to start.' },
   ])
   const [newMessage, setNewMessage] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [creditHistory, setCreditHistory] = useState<CreditTransaction[]>([])
+  const [creditHistory, setCreditHistory] = useState<CreditTransaction[]>([
+    {
+      id: Date.now(),
+      type: 'purchase',
+      amount: 500,
+      description: 'Welcome bonus credits',
+      date: new Date()
+    }
+  ])
 
   const onboardingSteps = [
     {

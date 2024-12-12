@@ -1,0 +1,76 @@
+type User @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  username: String!
+  profilePicture: String
+  credits: Int
+  sentMessages: [Message] @hasMany(indexName: "bySender", fields: ["id"])
+  receivedMessages: [Message] @hasMany(indexName: "byReceiver", fields: ["id"])
+  projects: [Project] @hasMany(indexName: "byUser", fields: ["id"])
+  creditTransactions: [CreditTransaction] @hasMany(indexName: "byUser", fields: ["id"])
+}
+
+type Message @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  senderId: ID!
+  receiverId: ID!
+  messageBody: String!
+  timestamp: AWSDateTime!
+  sender: User! @belongsTo(fields: ["senderId"])
+  receiver: User! @belongsTo(fields: ["receiverId"])
+}
+
+type Project @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  name: String!
+  description: String!
+  status: ProjectStatus!
+  timeline: Timeline!
+  serviceType: ServiceType!
+  userId: ID!
+  user: User! @belongsTo(fields: ["userId"])
+  messages: [ProjectMessage] @hasMany(indexName: "byProject", fields: ["id"])
+}
+
+type ProjectMessage @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  projectId: ID!
+  sender: String!
+  content: String!
+  timestamp: AWSDateTime!
+  project: Project! @belongsTo(fields: ["projectId"])
+}
+
+type CreditTransaction @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  userId: ID!
+  amount: Int!
+  transactionType: String!
+  description: String
+  timestamp: AWSDateTime!
+  user: User! @belongsTo(fields: ["userId"])
+}
+
+type Timeline {
+  created: AWSDateTime!
+  updated: AWSDateTime!
+  deadline: AWSDateTime
+}
+
+enum ProjectStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ServiceType {
+  MARKETING
+  EPK
+  ARTWORK
+  ADVISOR
+}
+
+type Subscription {
+  onCreateMessage(filter: ModelSubscriptionMessageFilterInput): Message @aws_subscribe(mutations: ["createMessage"])
+  onCreateProjectMessage(filter: ModelSubscriptionProjectMessageFilterInput): ProjectMessage @aws_subscribe(mutations: ["createProjectMessage"])
+} 

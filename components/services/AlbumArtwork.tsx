@@ -1,105 +1,94 @@
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { ImageIcon } from 'lucide-react'
+import { ServiceComponentProps } from '@/types/services'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ServiceChat } from '@/components/ui/ServiceChat'
 
-type ServicePurchase = {
-  service: 'marketing' | 'epk' | 'artwork' | 'advisor'
-  plan: string
-  cost: number
-  data: Record<string, string>
-}
+const ARTWORK_PLANS = [
+  {
+    name: 'Single Cover',
+    credits: 60,
+    features: [
+      '3000x3000px High Resolution',
+      '2 Revision Rounds',
+      'Social Media Formats',
+      'Commercial License'
+    ],
+    dimensions: '3000x3000px'
+  },
+  {
+    name: 'Album Cover',
+    credits: 120,
+    features: [
+      '3000x3000px High Resolution',
+      'Unlimited Revisions',
+      'All Digital Formats',
+      'Physical Format Templates',
+      'Commercial License',
+      'Source Files'
+    ],
+    dimensions: '3000x3000px'
+  }
+]
 
-type AlbumArtworkProps = {
-  onPurchase: (purchase: ServicePurchase) => boolean
-}
+const ARTWORK_SYSTEM_PROMPT = `You are an AI Art Director specialized in album cover design. 
+Your role is to provide guidance on visual aesthetics, help artists develop their visual identity, 
+and suggest design elements that align with their music style. 
+Please provide detailed visual descriptions and maintain a creative yet professional tone.`
 
-export function AlbumArtwork({ onPurchase }: AlbumArtworkProps) {
-  const [showForm, setShowForm] = useState(false)
-  const [plan, setPlan] = useState<'single' | 'album' | null>(null)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const formData = new FormData(e.target as HTMLFormElement)
-    const success = onPurchase({
+export function AlbumArtwork({ onPurchase }: ServiceComponentProps) {
+  const handlePurchase = async (plan: typeof ARTWORK_PLANS[0]) => {
+    onPurchase({
       service: 'artwork',
-      plan: plan || 'single',
-      cost: plan === 'single' ? 60 : 120,
-      data: {
-        title: formData.get('title') as string,
-        preferences: formData.get('preferences') as string,
-      }
+      plan: plan.name,
+      cost: plan.credits,
+      data: { dimensions: plan.dimensions }
     })
-    if (success) {
-      setShowForm(false)
-      setPlan(null)
-    }
   }
 
   return (
-    <Card className="relative overflow-hidden border-4 border-[#00FF9F] rounded-none bg-[#2D0E75]">
-      <CardHeader>
-        <CardTitle className="text-2xl text-[#00FF9F]">Album Artwork</CardTitle>
-        <CardDescription className="text-[#FF00E6]">Professional cover art design</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {!showForm ? (
-          <div className="space-y-4">
-            <Button 
-              className="w-full bg-[#FF6B6B] hover:bg-[#4CC9F0] text-white"
-              onClick={() => {
-                setPlan('single')
-                setShowForm(true)
-              }}
-            >
-              <ImageIcon className="mr-2" />
-              Single Cover (60 Credits)
-            </Button>
-            <Button 
-              className="w-full bg-[#FF6B6B] hover:bg-[#4CC9F0] text-white"
-              onClick={() => {
-                setPlan('album')
-                setShowForm(true)
-              }}
-            >
-              <ImageIcon className="mr-2" />
-              Album Cover (120 Credits)
-            </Button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input 
-              name="title"
-              placeholder="Project Title"
-              className="bg-[#120458] text-[#00FF9F] border-2 border-[#00FF9F]"
-            />
-            <Textarea 
-              name="preferences"
-              placeholder="Design Preferences (colors, style, mood, references)"
-              className="bg-[#120458] text-[#00FF9F] border-2 border-[#00FF9F]"
-            />
-            <div className="flex gap-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setShowForm(false)}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit"
-                className="bg-[#FF6B6B] hover:bg-[#4CC9F0] text-white"
-              >
-                Order {plan === 'single' ? 'Single' : 'Album'} Cover
-              </Button>
-            </div>
-          </form>
-        )}
-      </CardContent>
-    </Card>
+    <Tabs defaultValue="designs" className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="designs">Designs</TabsTrigger>
+        <TabsTrigger value="chat">Chat Assistant</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="designs">
+        <div className="grid gap-6 md:grid-cols-2">
+          {ARTWORK_PLANS.map((plan) => (
+            <Card key={plan.name} className="border-4 border-[#00FF9F] rounded-none bg-[#2D0E75]">
+              <CardHeader>
+                <CardTitle className="text-2xl text-[#00FF9F]">{plan.name}</CardTitle>
+                <CardDescription className="text-[#FF00E6]">
+                  {plan.credits} Credits | {plan.dimensions}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-white">
+                  {plan.features.map((feature) => (
+                    <li key={feature}>• {feature}</li>
+                  ))}
+                </ul>
+                <Button
+                  onClick={() => handlePurchase(plan)}
+                  className="mt-4 w-full bg-[#FF6B6B] hover:bg-[#4CC9F0] text-white"
+                >
+                  Design Cover ({plan.credits} Credits)
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </TabsContent>
+      
+      <TabsContent value="chat">
+        <ServiceChat 
+          serviceType="artwork"
+          systemPrompt={ARTWORK_SYSTEM_PROMPT}
+        />
+      </TabsContent>
+    </Tabs>
   )
 } 

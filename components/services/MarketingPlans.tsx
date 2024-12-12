@@ -1,100 +1,68 @@
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { useServices } from '@/lib/hooks/useServices'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { ServiceComponentProps, ServicePurchase } from '@/types/services'
 
-type ServicePurchase = {
-  service: 'marketing' | 'epk' | 'artwork' | 'advisor'
-  plan: string
-  cost: number
-  data: Record<string, string>
-}
+const MARKETING_PLANS = [
+  {
+    name: 'Basic Plan',
+    credits: 50,
+    features: [
+      'Social Media Strategy',
+      'Content Calendar',
+      'Basic Analytics'
+    ]
+  },
+  {
+    name: 'Pro Plan',
+    credits: 100,
+    features: [
+      'Everything in Basic',
+      'Advanced Analytics',
+      'Competitor Analysis',
+      'Paid Advertising Strategy'
+    ]
+  }
+]
 
-type MarketingPlansProps = {
-  onPurchase: (purchase: ServicePurchase) => boolean
-}
+export function MarketingPlans({ onPurchase }: ServiceComponentProps) {
+  const { purchaseService, loading, error } = useServices()
 
-export function MarketingPlans({ onPurchase }: MarketingPlansProps) {
-  const [showForm, setShowForm] = useState(false)
-  const [plan, setPlan] = useState<'basic' | 'pro' | null>(null)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const formData = new FormData(e.target as HTMLFormElement)
-    const success = onPurchase({
-      service: 'marketing',
-      plan: plan || 'basic',
-      cost: plan === 'basic' ? 50 : 100,
-      data: {
-        title: formData.get('title') as string,
-        goals: formData.get('goals') as string,
-      }
-    })
-    if (success) {
-      setShowForm(false)
-      setPlan(null)
+  const handlePurchase = async (plan: typeof MARKETING_PLANS[0]) => {
+    try {
+      await purchaseService('marketing', plan.credits)
+    } catch (err) {
+      // Error handled by hook
     }
   }
 
   return (
-    <Card className="relative overflow-hidden border-4 border-[#00FF9F] rounded-none bg-[#2D0E75]">
-      <CardHeader>
-        <CardTitle className="text-2xl text-[#00FF9F]">Marketing Plans</CardTitle>
-        <CardDescription className="text-[#FF00E6]">Promote your music effectively</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {!showForm ? (
-          <div className="space-y-4">
-            <Button 
-              className="w-full bg-[#FF6B6B] hover:bg-[#4CC9F0] text-white"
-              onClick={() => {
-                setPlan('basic')
-                setShowForm(true)
-              }}
+    <div className="grid gap-6 md:grid-cols-2">
+      {MARKETING_PLANS.map((plan) => (
+        <Card key={plan.name} className="border-4 border-[#00FF9F] rounded-none bg-[#2D0E75]">
+          <CardHeader>
+            <CardTitle className="text-2xl text-[#00FF9F]">{plan.name}</CardTitle>
+            <CardDescription className="text-[#FF00E6]">{plan.credits} Credits</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-white">
+              {plan.features.map((feature) => (
+                <li key={feature}>• {feature}</li>
+              ))}
+            </ul>
+            <Button
+              onClick={() => handlePurchase(plan)}
+              disabled={loading}
+              className="mt-4 w-full bg-[#FF6B6B] hover:bg-[#4CC9F0] text-white"
             >
-              Basic Plan (50 Credits)
+              {loading ? 'Processing...' : `Purchase (${plan.credits} Credits)`}
             </Button>
-            <Button 
-              className="w-full bg-[#FF6B6B] hover:bg-[#4CC9F0] text-white"
-              onClick={() => {
-                setPlan('pro')
-                setShowForm(true)
-              }}
-            >
-              Pro Plan (100 Credits)
-            </Button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input 
-              placeholder="Song/Album Title"
-              className="bg-[#120458] text-[#00FF9F] border-2 border-[#00FF9F]"
-            />
-            <Textarea 
-              placeholder="Marketing Goals"
-              className="bg-[#120458] text-[#00FF9F] border-2 border-[#00FF9F]"
-            />
-            <div className="flex gap-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setShowForm(false)}
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit"
-                className="bg-[#FF6B6B] hover:bg-[#4CC9F0] text-white"
-              >
-                Purchase {plan === 'basic' ? 'Basic' : 'Pro'} Plan
-              </Button>
-            </div>
-          </form>
-        )}
-      </CardContent>
-    </Card>
+            {error && <p className="mt-2 text-red-500">{error}</p>}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   )
 } 
